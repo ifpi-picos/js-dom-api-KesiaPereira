@@ -66,3 +66,44 @@ document.addEventListener('DOMContentLoaded', () => {
     li.appendChild(removerBotao);
   });
 });
+
+const { google } = require('googleapis');
+const auth = new google.auth.GoogleAuth({
+  keyFile: 'path/to/credentials.json',
+  scopes: 'https://www.googleapis.com/auth/calendar',
+});
+const calendar = google.calendar('v3');
+
+async function createEvent() {
+  const authClient = await auth.authorize();
+  const event = {
+    summary: 'Task: ' + tarefaTexto,
+    location: '',
+    description: tarefaData + ' - ' + etiquetaTexto,
+    start: {
+      dateTime: tarefaData + 'T00:00:00-07:00',
+      timeZone: 'America/Los_Angeles',
+    },
+    end: {
+      dateTime: tarefaData + 'T00:00:00-07:00',
+      timeZone: 'America/Los_Angeles',
+    },
+    attendees: [
+      {'email': 'kesiapereira2003@gmail.com'},
+    ],
+  };
+
+  calendar.events.insert({
+    auth: authClient,
+    calendarId: 'Primario',
+    resource: event,
+  }, (err, event) => {
+    if (err) {
+      console.log('Erro de Conexão: ' + err);
+      return;
+    }
+    console.log('Evento criado: %s', event.htmlLink);
+  });
+}
+
+createEvent();
