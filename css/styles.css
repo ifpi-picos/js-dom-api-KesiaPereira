@@ -1,0 +1,39 @@
+body {
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  #adicionarTarefa {
+    margin-bottom: 1rem;
+  }
+  
+  #listaTarefa {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .itemTarefa {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem;
+    border-bottom: 1px solid #ccc;
+  }
+  
+  .itemTarefa:last-child {
+    border-bottom: none;
+  }
+  
+  .itemTarefa button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0.25rem;
+  }
+  
+  .itemTarefa button:hover {
+    background-color: #eee;
+  }
