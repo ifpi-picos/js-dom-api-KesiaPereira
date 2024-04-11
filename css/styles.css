@@ -5,35 +5,50 @@ body {
   }
   
   #adicionarTarefa {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 1rem;
   }
   
-  #listaTarefa {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .itemTarefa {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  #novaTarefa {
+    flex-grow: 1;
     padding: 0.5rem;
-    border-bottom: 1px solid #ccc;
+    margin-right: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
   }
   
-  .itemTarefa:last-child {
-    border-bottom: none;
+  #listaTarefa {
+    list-style-type: none;
+    padding: 0;
   }
   
-  .itemTarefa button {
-    background-color: transparent;
+  li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  button {
+    padding: 0.5rem;
+    margin-left: 1rem;
     border: none;
+    border-radius: 4px;
+    background-color: #4CAF50;
+    color: white;
     cursor: pointer;
-    font-size: 1rem;
-    padding: 0.25rem;
   }
   
-  .itemTarefa button:hover {
-    background-color: #eee;
+  button:hover {
+    background-color: #3e8e41;
+  }
+  
+  button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
   }

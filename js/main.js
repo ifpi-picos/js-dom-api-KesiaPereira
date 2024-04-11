@@ -1,53 +1,68 @@
 const adicionar = document.getElementById('adicionarTarefa');
 const lista = document.getElementById('listaTarefa');
-const entrada = document.getElementById('novaTarefa');
+const entradaTarefa = document.getElementById('novaTarefa');
+const entradaEtiqueta = document.getElementById('novaEtiqueta');
 
-// Load tarefas from local storage
-const tarefas = JSON.parse(localStorage.getItem('tarefas')) || [];
+let tarefas = JSON.parse(localStorage.getItem('tarefas')) || [];
 
-// Render tarefas
-function renderizarTarefas() {
-  lista.innerHTML = '';
-  tarefas.forEach((tarefa, index) => {
-    const li = document.createElement('li');
-    li.classList.add('itemTarefa');
-    li.innerHTML = `
-      <span>${tarefa}</span>
-      <button onclick="concluirTarefa(${index})">Concluir</button>
-      <button onclick="removerTarefa(${index})">Remover</button>
-    `;
-    lista.appendChild(li);
-  });
-}
-
-// Adicionar tarefa
-function addTask(tarefa) {
-  tarefas.push(tarefa);
-  localStorage.setItem('tarefas', JSON.stringify(tarefas));
-  renderizarTarefas();
-}
-
-//Concluir tarefa
-function concluirTarefa(index) {
-  tarefas.splice(index, 1);
-  localStorage.setItem('tarefas', JSON.stringify(tarefas));
-  renderizarTarefas();
-}
-
-//Remover tarefa
-function removerTarefa(index) {
-  tarefas.splice(index, 1);
-  localStorage.setItem('tarefas', JSON.stringify(tarefas));
-  renderizarTarefas();
-}
-
-//EventListener para adicionar uma nova entrada
 adicionar.addEventListener('submit', (e) => {
   e.preventDefault();
-  if (!entrada.value.trim()) return;
-  addTask(entrada.value);
-  entrada.value = '';
+  const tarefaTexto = entradaTarefa.value.trim();
+  const etiquetaTexto = entradaEtiqueta.value.trim();
+  if (!tarefaTexto) return;
+
+  const tarefaData = new Date().toISOString();
+  const tarefa = { text: tarefaTexto, date: tarefaData, isCompleted: false, etiqueta: etiquetaTexto };
+
+  const li = document.createElement('li');
+  li.textContent = `${tarefaTexto} - ${tarefaData} - ${etiquetaTexto}`;
+  lista.appendChild(li);
+
+  tarefas.push(tarefa);
+  localStorage.setItem('tarefas', JSON.stringify(tarefas));
+
+  const concluirBotao = document.createElement('button');
+  concluirBotao.textContent = 'Concluir';
+  concluirBotao.addEventListener('click', () => concluirTarefa(tarefa, li));
+  li.appendChild(concluirBotao);
+
+  const removerBotao = document.createElement('button');
+  removerBotao.textContent = 'Remover';
+  removerBotao.addEventListener('click', () => removerTarefa(li));
+  li.appendChild(removerBotao);
+
+  entradaTarefa.value = '';
+  entradaEtiqueta.value = '';
 });
 
-//Renderização inicial
-renderizarTarefas();
+function concluirTarefa(tarefa, li) {
+  tarefa.isCompleted = true;
+  li.style.textDecoration = 'line-through';
+  localStorage.setItem('tarefas', JSON.stringify(tarefas));
+}
+
+function removerTarefa(li) {
+  const tarefaTexto = li.textContent.slice(0, -14);
+  tarefas = tarefas.filter((tarefa) => tarefa.text !== tarefaTexto);
+  localStorage.setItem('tarefas', JSON.stringify(tarefas));
+  li.remove();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  tarefas.forEach((tarefa) => {
+    const li = document.createElement('li');
+    li.textContent = `${tarefa.text} - ${tarefa.date}`;
+    if (tarefa.isCompleted) li.style.textDecoration = 'line-through';
+    lista.appendChild(li);
+
+    const concluirBotao = document.createElement('button');
+    concluirBotao.textContent = 'Concluir';
+    concluirBotao.addEventListener('click', () => concluirTarefa(tarefa, li));
+    li.appendChild(concluirBotao);
+
+    const removerBotao = document.createElement('button');
+    removerBotao.textContent = 'Remover';
+    removerBotao.addEventListener('click', () => removerTarefa(li));
+    li.appendChild(removerBotao);
+  });
+});
