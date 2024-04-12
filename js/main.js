@@ -1,32 +1,48 @@
 // Função para adicionar uma nova tarefa
 function addTask() {
     var taskInput = document.getElementById("taskInput");
+    var tagInput = document.getElementById("tagInput");
     var taskText = taskInput.value.trim();
+    var tagText = tagInput.value.trim(); // Obtém o valor do campo de entrada da etiqueta
+
     if (taskText !== "") {
         var taskItem = document.createElement("li");
-        taskItem.textContent = taskText;
+
+        // Cria um elemento de span para o texto da tarefa
+        var taskTextSpan = document.createElement("span");
+        taskTextSpan.textContent = taskText;
+        taskItem.appendChild(taskTextSpan); // Adiciona o elemento de texto da tarefa ao item da lista
+
+        // Adiciona a etiqueta como uma classe ao item da lista
+        if (tagText !== "") {
+            taskItem.classList.add(tagText.toLowerCase()); // Converte a etiqueta para minúsculas e a adiciona como uma classe
+            var tagSpan = document.createElement("span");
+            tagSpan.textContent = "[" + tagText + "] ";
+            taskItem.insertBefore(tagSpan, taskTextSpan); // Adiciona a etiqueta ao lado do texto da tarefa
+        }
+
+        var taskButtons = document.createElement("div");
+        taskButtons.classList.add("taskButtons");
 
         var completeButton = document.createElement("button");
         completeButton.textContent = "Complete";
         completeButton.onclick = function() {
             completeTask(taskItem);
         };
+        taskButtons.appendChild(completeButton);
 
         var removeButton = document.createElement("button");
         removeButton.textContent = "Remove";
         removeButton.onclick = function() {
             removeTask(taskItem);
         };
-
-        var taskButtons = document.createElement("div");
-        taskButtons.classList.add("taskButtons");
-        taskButtons.appendChild(completeButton);
         taskButtons.appendChild(removeButton);
 
         taskItem.appendChild(taskButtons);
 
         document.getElementById("taskList").appendChild(taskItem);
         taskInput.value = "";
+        tagInput.value = ""; // Limpa o campo de entrada da etiqueta
 
         // Salvar no armazenamento local
         saveTasks();
@@ -55,7 +71,7 @@ function saveTasks() {
     var taskItems = document.querySelectorAll("#taskList li");
     taskItems.forEach(function(taskItem) {
         var task = {
-            text: taskItem.textContent,
+            text: taskItem.querySelector("span").textContent, // Obtém o texto da tarefa do elemento de span
             completed: taskItem.classList.contains("completed")
         };
         tasks.push(task);
@@ -68,8 +84,9 @@ window.onload = function() {
     var tasks = JSON.parse(localStorage.getItem("tasks")) || [];
     tasks.forEach(function(task) {
         var taskItem = document.createElement("li");
-        var taskText = document.createElement("span"); // Cria um elemento span para o texto da tarefa
-        taskText.textContent = task.text; // Define o texto da tarefa no elemento span
+        var taskTextSpan = document.createElement("span"); // Cria um elemento span para o texto da tarefa
+        taskTextSpan.textContent = task.text; // Define o texto da tarefa no elemento span
+        taskItem.appendChild(taskTextSpan); // Adiciona o elemento span ao item da lista
 
         if (task.completed) {
             taskItem.classList.add("completed");
@@ -92,7 +109,6 @@ window.onload = function() {
         };
         taskButtons.appendChild(removeButton);
 
-        taskItem.appendChild(taskText); // Adiciona o elemento span ao item da lista
         taskItem.appendChild(taskButtons);
 
         document.getElementById("taskList").appendChild(taskItem);
