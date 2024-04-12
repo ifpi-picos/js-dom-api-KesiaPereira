@@ -1,24 +1,55 @@
+// Função para obter a data e hora atual da API do NTP
+async function getCurrentDateTime() {
+    try {
+        const response = await fetch('https://worldtimeapi.org/api/ip');
+        const data = await response.json();
+        return new Date(data.utc_datetime);
+    } catch (error) {
+        console.error('Erro ao obter a data e hora atual:', error);
+        return null;
+    }
+}
+
 // Função para adicionar uma nova tarefa
-function addTask() {
+async function addTask() {
     var taskInput = document.getElementById("taskInput");
     var tagInput = document.getElementById("tagInput");
+    var dueDateInput = document.getElementById("dueDateInput"); // Novo campo de entrada para a data limite
     var taskText = taskInput.value.trim();
     var tagText = tagInput.value.trim(); // Obtém o valor do campo de entrada da etiqueta
+    var dueDateText = dueDateInput.value; // Obtém o valor do campo de entrada da data limite
 
     if (taskText !== "") {
         var taskItem = document.createElement("li");
 
-        // Cria um elemento de span para o texto da tarefa
-        var taskTextSpan = document.createElement("span");
-        taskTextSpan.textContent = taskText;
-        taskItem.appendChild(taskTextSpan); // Adiciona o elemento de texto da tarefa ao item da lista
-
         // Adiciona a etiqueta como uma classe ao item da lista
         if (tagText !== "") {
             taskItem.classList.add(tagText.toLowerCase()); // Converte a etiqueta para minúsculas e a adiciona como uma classe
+
+            // Cria um elemento de span para a etiqueta
             var tagSpan = document.createElement("span");
             tagSpan.textContent = "[" + tagText + "] ";
-            taskItem.insertBefore(tagSpan, taskTextSpan); // Adiciona a etiqueta ao lado do texto da tarefa
+            taskItem.appendChild(tagSpan); // Adiciona o elemento de span da etiqueta ao item da lista
+        }
+
+        // Cria um elemento de span para o texto da tarefa
+        var taskTextSpan = document.createElement("span");
+        taskTextSpan.textContent = taskText;
+        taskItem.appendChild(taskTextSpan); // Adiciona o elemento de span do texto da tarefa ao item da lista
+
+        // Adiciona a data limite ao lado do texto da tarefa
+        if (dueDateText !== "") {
+            var dueDateSpan = document.createElement("span");
+            dueDateSpan.textContent = " - Due: " + dueDateText;
+            
+            // Verifica se a data limite já passou
+            var currentDate = new Date();
+            var dueDate = new Date(dueDateText);
+            if (dueDate < currentDate) {
+                dueDateSpan.style.color = "red"; // Define a cor vermelha para a data limite se ela já tiver passado
+            }
+            
+            taskItem.appendChild(dueDateSpan); // Adiciona o elemento de span da data limite ao item da lista
         }
 
         var taskButtons = document.createElement("div");
@@ -43,6 +74,7 @@ function addTask() {
         document.getElementById("taskList").appendChild(taskItem);
         taskInput.value = "";
         tagInput.value = ""; // Limpa o campo de entrada da etiqueta
+        dueDateInput.value = ""; // Limpa o campo de entrada da data limite
 
         // Salvar no armazenamento local
         saveTasks();
