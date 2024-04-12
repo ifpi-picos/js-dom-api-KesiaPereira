@@ -1,109 +1,100 @@
-const adicionar = document.getElementById('adicionarTarefa');
-const lista = document.getElementById('listaTarefa');
-const entradaTarefa = document.getElementById('novaTarefa');
-const entradaEtiqueta = document.getElementById('novaEtiqueta');
+// Função para adicionar uma nova tarefa
+function addTask() {
+    var taskInput = document.getElementById("taskInput");
+    var taskText = taskInput.value.trim();
+    if (taskText !== "") {
+        var taskItem = document.createElement("li");
+        taskItem.textContent = taskText;
 
-let tarefas = JSON.parse(localStorage.getItem('tarefas')) || [];
+        var completeButton = document.createElement("button");
+        completeButton.textContent = "Complete";
+        completeButton.onclick = function() {
+            completeTask(taskItem);
+        };
 
-adicionar.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const tarefaTexto = entradaTarefa.value.trim();
-  const etiquetaTexto = entradaEtiqueta.value.trim();
-  if (!tarefaTexto) return;
+        var removeButton = document.createElement("button");
+        removeButton.textContent = "Remove";
+        removeButton.onclick = function() {
+            removeTask(taskItem);
+        };
 
-  const tarefaData = new Date().toISOString();
-  const tarefa = { text: tarefaTexto, date: tarefaData, isCompleted: false, etiqueta: etiquetaTexto };
+        var taskButtons = document.createElement("div");
+        taskButtons.classList.add("taskButtons");
+        taskButtons.appendChild(completeButton);
+        taskButtons.appendChild(removeButton);
 
-  const li = document.createElement('li');
-  li.textContent = `${tarefaTexto} - ${tarefaData} - ${etiquetaTexto}`;
-  lista.appendChild(li);
+        taskItem.appendChild(taskButtons);
 
-  tarefas.push(tarefa);
-  localStorage.setItem('tarefas', JSON.stringify(tarefas));
+        document.getElementById("taskList").appendChild(taskItem);
+        taskInput.value = "";
 
-  const concluirBotao = document.createElement('button');
-  concluirBotao.textContent = 'Concluir';
-  concluirBotao.addEventListener('click', () => concluirTarefa(tarefa, li));
-  li.appendChild(concluirBotao);
-
-  const removerBotao = document.createElement('button');
-  removerBotao.textContent = 'Remover';
-  removerBotao.addEventListener('click', () => removerTarefa(li));
-  li.appendChild(removerBotao);
-
-  entradaTarefa.value = '';
-  entradaEtiqueta.value = '';
-});
-
-function concluirTarefa(tarefa, li) {
-  tarefa.isCompleted = true;
-  li.style.textDecoration = 'line-through';
-  localStorage.setItem('tarefas', JSON.stringify(tarefas));
-}
-
-function removerTarefa(li) {
-  const tarefaTexto = li.textContent.slice(0, -14);
-  tarefas = tarefas.filter((tarefa) => tarefa.text !== tarefaTexto);
-  localStorage.setItem('tarefas', JSON.stringify(tarefas));
-  li.remove();
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  tarefas.forEach((tarefa) => {
-    const li = document.createElement('li');
-    li.textContent = `${tarefa.text} - ${tarefa.date}`;
-    if (tarefa.isCompleted) li.style.textDecoration = 'line-through';
-    lista.appendChild(li);
-
-    const concluirBotao = document.createElement('button');
-    concluirBotao.textContent = 'Concluir';
-    concluirBotao.addEventListener('click', () => concluirTarefa(tarefa, li));
-    li.appendChild(concluirBotao);
-
-    const removerBotao = document.createElement('button');
-    removerBotao.textContent = 'Remover';
-    removerBotao.addEventListener('click', () => removerTarefa(li));
-    li.appendChild(removerBotao);
-  });
-});
-
-const { google } = require('googleapis');
-const auth = new google.auth.GoogleAuth({
-  keyFile: 'path/to/credentials.json',
-  scopes: 'https://www.googleapis.com/auth/calendar',
-});
-const calendar = google.calendar('v3');
-
-async function createEvent() {
-  const authClient = await auth.authorize();
-  const event = {
-    summary: 'Task: ' + tarefaTexto,
-    location: '',
-    description: tarefaData + ' - ' + etiquetaTexto,
-    start: {
-      dateTime: tarefaData + 'T00:00:00-07:00',
-      timeZone: 'America/Los_Angeles',
-    },
-    end: {
-      dateTime: tarefaData + 'T00:00:00-07:00',
-      timeZone: 'America/Los_Angeles',
-    },
-    attendees: [
-      {'email': 'kesiapereira2003@gmail.com'},
-    ],
-  };
-
-  calendar.events.insert({
-    auth: authClient,
-    calendarId: 'Primario',
-    resource: event,
-  }, (err, event) => {
-    if (err) {
-      console.log('Erro de Conexão: ' + err);
-      return;
+        // Salvar no armazenamento local
+        saveTasks();
     }
-    console.log('Evento criado: %s', event.htmlLink);
-  });
 }
 
-createEvent();
+// Função para concluir uma tarefa
+function completeTask(taskItem) {
+    taskItem.classList.toggle("completed");
+
+    // Salvar no armazenamento local
+    saveTasks();
+}
+
+// Função para remover uma tarefa
+function removeTask(taskItem) {
+    taskItem.remove();
+
+    // Salvar no armazenamento local
+    saveTasks();
+}
+
+// Função para salvar as tarefas no armazenamento local
+function saveTasks() {
+    var tasks = [];
+    var taskItems = document.querySelectorAll("#taskList li");
+    taskItems.forEach(function(taskItem) {
+        var task = {
+            text: taskItem.textContent,
+            completed: taskItem.classList.contains("completed")
+        };
+        tasks.push(task);
+    });
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
+// Função para carregar as tarefas do armazenamento local ao carregar a página
+window.onload = function() {
+    var tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    tasks.forEach(function(task) {
+        var taskItem = document.createElement("li");
+        var taskText = document.createElement("span"); // Cria um elemento span para o texto da tarefa
+        taskText.textContent = task.text; // Define o texto da tarefa no elemento span
+
+        if (task.completed) {
+            taskItem.classList.add("completed");
+        }
+
+        var taskButtons = document.createElement("div");
+        taskButtons.classList.add("taskButtons");
+
+        var completeButton = document.createElement("button");
+        completeButton.textContent = "Complete";
+        completeButton.onclick = function() {
+            completeTask(taskItem);
+        };
+        taskButtons.appendChild(completeButton);
+
+        var removeButton = document.createElement("button");
+        removeButton.textContent = "Remove";
+        removeButton.onclick = function() {
+            removeTask(taskItem);
+        };
+        taskButtons.appendChild(removeButton);
+
+        taskItem.appendChild(taskText); // Adiciona o elemento span ao item da lista
+        taskItem.appendChild(taskButtons);
+
+        document.getElementById("taskList").appendChild(taskItem);
+    });
+};

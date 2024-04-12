@@ -1,18 +1,25 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Gerenciador de Tarefas</title>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TO-DO List</title>
     <link rel="stylesheet" href="./css/styles.css">
-  </head>
-  <body>
-    <h1>Gerenciador de Tarefas</h1>
-    <form id="adicionarTarefa">
-        <input type="text" id="novaTarefa" placeholder="Adicionar tarefa...">
-        <input type="text" id="novaEtiqueta" placeholder="Adicionar etiqueta (opcional)...">
-        <button type="submit">Adicionar</button>
-      </form>
-      <ul id="listaTarefa"></ul>
-    <ul id="listaTarefa"></ul>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="container">
+            <div class="header">
+                <h1>TO-DO List</h1>
+                <input type="text" id="taskInput" placeholder="Add a new task">
+                <button id="addTaskButton" onclick="addTask()">Add</button>
+            </div>
+            <div class="content">
+                <ul id="taskList"></ul>
+            </div>
+        </div>
+    </div>
+
     <script src="./js/main.js"></script>
-  </body>
+</body>
 </html>
